@@ -277,7 +277,7 @@ if($info_type==3){
 	}
 	$out.='<select name="newpoletype">'.$options.'</select><br>';
 	$out.='
-		Значение (для типа "список","переключатель","флажок")<br>
+		Значение (для типа "список","переключатель","флажок") в формате "значение==подпись" либо просто "подпись", если значение и подпись совпадают (каждый вариант - с новой строки):<br>
 		<textarea name="newpolevalue"></textarea>
 		<br>
 		Обязательно <input type="checkbox" name="newpolerequire" value="1"><br><br>
@@ -302,7 +302,7 @@ if($info_type==4){
 		$options.="<option value='".$k."' ".($k==$pole_info['type']?" selected=selected":"").">".$v."</option>";
 	}
 	$out.='<select name="curpoletype">'.$options.'</select><br>
-			Значение (для типа "список","переключатель","флажок"): 
+			Значение (для типа "список","переключатель","флажок") в формате "значение==подпись" либо просто "подпись", если значение и подпись совпадают (каждый вариант - с новой строки): 
 			<br>
 			<textarea name="curpolevalue">'.$pole_info['value'].'</textarea><br>
 			Обязательно: <input type="checkbox" value="1" name="curpolerequire" '.($pole_info['required']==1?' checked="checked"':'').'><br><br>
