@@ -89,6 +89,24 @@ function makeTpl($id,$capcha=false){
 					$f.="<input type='file' name='param".$k."' class='f_file' eform='".$v['title'].":".$type.":".$req."'>";
 					break;
 					
+				  case 9:
+					$f.="<div class='multiselector'><select name='param".$k."[]' class='f_multiselector' multiple='multiple' size='5' eform='".$v['title']."::".$req."'>";
+					$opts=explode("\n",$v['value']);
+					$opt='';
+					foreach($opts as $k1=>$v1){
+						$v1=trim($v1);
+						$arr=explode("==",$v1);
+						$key=$arr[0];
+						$val=isset($arr[1])&&$arr[1]!=''?$arr[1]:$arr[0];
+						$opt.="<option value='".$key."'>".$val."</option>";
+					}
+					$f.=$opt."</select></div>";
+					break;
+				
+				  case 10:
+					$f.="<input type='hidden' name='param".$k."' value='' class='f_hidden' eform='".$v['title'].":".$type.":".$req."'>";
+					break;
+					
 				  default:
 					$f.="<input type='text' name='param".$k."' value='' class='f_txt' eform='".$v['title'].":".$type.":".$req."'>";
 					break;
