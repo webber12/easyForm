@@ -10,7 +10,7 @@ function getFormInfo($id){
 	return $info;
 }
 
-function makeTpl($id){
+function makeTpl($id,$capcha=false){
 	global $modx;
 	$f='';
 	if(isset($id)&&$modx->db->getRecordCount($modx->db->query("SELECT * FROM ".$modx->getFullTableName('forms')." WHERE id=".$id." LIMIT 0,1"))==1)
@@ -30,7 +30,8 @@ function makeTpl($id){
 				<div class="f_zagol">'.$forma_info['name'].'</div>
 				<div class="f_description">'.$forma_info['title'].'</div>
 				<p>[+validationmessage+]</p>
-				<form id="f'.$id.'" action="[~[*id*]~]" method="post"><table class="f_table">
+				<form id="f'.$id.'" action="[~[*id*]~]" method="post">
+				<table class="f_table">
 			';
 			foreach($form as $k=>$v){
 				$req=$v['required']==1?1:0;
@@ -48,7 +49,10 @@ function makeTpl($id){
 					$opt='';
 					foreach($opts as $k1=>$v1){
 						$v1=trim($v1);
-						$opt.="<option value='".$v1."'>".$v1."</option>";
+						$arr=explode("==",$v1);
+						$key=$arr[0];
+						$val=isset($arr[1])&&$arr[1]!=''?$arr[1]:$arr[0];
+						$opt.="<option value='".$key."'>".$val."</option>";
 					}
 					$f.=$opt."</select></div>";
 					break;
@@ -59,7 +63,10 @@ function makeTpl($id){
 					$opt='';
 					foreach($opts as $k1=>$v1){
 						$v1=trim($v1);
-						$opt.="<label>".$v1." <input type='radio' name='param".$k."' value='".$v1."' ".($k1==0?"eform='".$v['title']."::".$req."'":"")."></label>";
+						$arr=explode("==",$v1);
+						$key=$arr[0];
+						$val=isset($arr[1])&&$arr[1]!=''?$arr[1]:$arr[0];
+						$opt.="<label>".$val." <input type='radio' name='param".$k."' value='".$key."' ".($k1==0?"eform='".$v['title']."::".$req."'":"")."></label>";
 					}
 					$f.=$opt."</div>";
 					break;
@@ -70,7 +77,10 @@ function makeTpl($id){
 					$opt='';
 					foreach($opts as $k1=>$v1){
 						$v1=trim($v1);
-						$opt.="<label>".$v1." <input type='checkbox' name='param".$k."[]' value='".$v1."' ".($k1==0?"eform='".$v['title']."::".$req."'":"")."></label>";
+						$arr=explode("==",$v1);
+						$key=$arr[0];
+						$val=isset($arr[1])&&$arr[1]!=''?$arr[1]:$arr[0];
+						$opt.="<label>".$val." <input type='checkbox' name='param".$k."[]' value='".$key."' ".($k1==0?"eform='".$v['title']."::".$req."'":"")."></label>";
 					}
 					$f.=$opt."</div>";
 					break;
@@ -85,6 +95,12 @@ function makeTpl($id){
 				}
 			
 				$f.='</td></tr>';
+			}
+			if($capcha){
+				$f.='
+				<tr><td>Введите код с картинки: </td>
+				<td><input type="text" class="f_ver" name="vericode" /><br><img class="feed" id="capcha'.$id.'" src="[+verimageurl+]" alt="Введите код" /><br><a href="javascript:;" onclick="document.getElementById(\'capcha'.$id.'\').src=\''.MODX_BASE_URL.MGR_DIR.'/includes/veriword.php?rand=\'+Math.random();">обновить картинку</a></td></tr>
+				';
 			}
 			$f.='<tr><td></td><td><div class="sendbuttons"><input type="submit" value="Отправить"</div></td></tr>';
 			$f.='</table></form>';
