@@ -31,12 +31,12 @@ function makeTpl($id,$capcha=false){
 				<div class="f_description">'.$forma_info['title'].'</div>
 				<p>[+validationmessage+]</p>
 				<form id="f'.$id.'" action="[~[*id*]~]" method="post">
-				<table class="f_table">
+				<div class="f_form f_form'.$id.'">
 			';
 			foreach($form as $k=>$v){
 				$req=$v['required']==1?1:0;
 				$type=$v['type']==3?'email':'string';
-				$f.='<tr><td class="f_title">'.$v['title'].' '.($req==1?'<span class="red">*</span>':'').'</td><td>';
+				$f.='<div class="f_row f_row'.$k.'"><div class="f_title">'.$v['title'].' '.($req==1?'<span class="red">*</span>':'').'</div><div class="field">';
 				
 				switch($v['type']){
 				  case 2:
@@ -94,16 +94,18 @@ function makeTpl($id,$capcha=false){
 					break;
 				}
 			
-				$f.='</td></tr>';
+				$f.='</div></div>';
 			}
 			if($capcha){
 				$f.='
-				<tr><td>Введите код с картинки: </td>
-				<td><input type="text" class="f_ver" name="vericode" /><br><img class="feed" id="capcha'.$id.'" src="[+verimageurl+]" alt="Введите код" /><br><a href="javascript:;" onclick="document.getElementById(\'capcha'.$id.'\').src=\''.MODX_BASE_URL.MGR_DIR.'/includes/veriword.php?rand=\'+Math.random();">обновить картинку</a></td></tr>
+				<div class="f_capcha">
+					<div class="f_title">Введите код с картинки: </div>
+					<div class="f_field"><input type="text" class="f_ver" name="vericode" /><div class="f_image_capcha"><img class="feed" id="capcha'.$id.'" src="[+verimageurl+]" alt="Введите код" /></div><div class="f_renew_capcha"><a href="javascript:;" onclick="document.getElementById(\'capcha'.$id.'\').src=\''.MODX_BASE_URL.MGR_DIR.'/includes/veriword.php?rand=\'+Math.random();">обновить картинку</a></div></div>
+				</div>
 				';
 			}
-			$f.='<tr><td></td><td><div class="sendbuttons"><input type="submit" value="Отправить"</div></td></tr>';
-			$f.='</table></form>';
+			$f.='<div class="f_sendbutton"><input type="submit" value="Отправить"</div>';
+			$f.='</div></form>';
 		}
 	return $f;
 	}
