@@ -48,9 +48,6 @@ $(document).on("keyup change","input.required,textarea.required,input.invalid,te
 	$(this).parent().parent().removeClass("required");
 });
 
-$(document).on("click","easyForm input[type='radio'].required",function(){
-	$(this).parent().parent().removeClass("required");
-})
 
 
 
