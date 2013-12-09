@@ -27,10 +27,16 @@ $(document).on("submit","form.easyForm",function(event){
 				showInfo(error);
 				$("div#"+parent_id).html(response);
 				$("div#"+parent_id).css({'opacity':'1'});
+				$("div#"+parent_id+" input[type='checkbox'].required").each(function(){
+					$(this).parent().parent().addClass("required");
+				})
+				$("div#"+parent_id+" input[type='radio'].required").each(function(){
+					$(this).parent().parent().addClass("required");
+				})
 			}
 			else{
 				$("div#"+parent_id).css({'opacity':'1'});
-				$("div#"+parent_id).html(response);
+				$("div#"+parent_id).html('<h3>Спасибо!</h3><p>Ваша информация успешно отправлена.</p>');
 			}
 		}
 	});
@@ -39,7 +45,12 @@ $(document).on("submit","form.easyForm",function(event){
 
 $(document).on("keyup change","input.required,textarea.required,input.invalid,textarea.invalid",function(e){
 	$(this).removeClass("required").removeClass("invalid");
+	$(this).parent().parent().removeClass("required");
 });
+
+$(document).on("click","easyForm input[type='radio'].required",function(){
+	$(this).parent().parent().removeClass("required");
+})
 
 
 
