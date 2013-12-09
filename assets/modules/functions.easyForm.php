@@ -29,9 +29,9 @@ function makeTpl($id,$capcha=false){
 			$f='
 				<div class="f_zagol">'.$forma_info['name'].'</div>
 				<div class="f_description">'.$forma_info['title'].'</div>
-				<p>[+validationmessage+]</p>
-				<form id="f'.$id.'" action="[~[*id*]~]" method="post">
-				<div class="f_form f_form'.$id.'">
+				<div class="f_form f_form'.$id.'" id="f_form'.$id.'">
+					<div class="validation_message">[+validationmessage+]</div>
+					<form id="f'.$id.'" class="easyForm" action="[~[*id*]~]" method="post">		
 			';
 			foreach($form as $k=>$v){
 				$req=$v['required']==1?1:0;
@@ -123,7 +123,7 @@ function makeTpl($id,$capcha=false){
 				';
 			}
 			$f.='<div class="f_sendbutton"><input type="submit" value="Отправить"</div>';
-			$f.='</div></form>';
+			$f.='</form></div>';
 		}
 	return $f;
 	}

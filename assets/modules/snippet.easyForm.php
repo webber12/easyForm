@@ -10,6 +10,7 @@
 // &tpl, &reportTpl и &to задавать не нужно - они формируются автоматом из того, что задано в модуле easyForm
 
 if(!defined('MODX_BASE_PATH')){die('What are you doing? Get out of here!');}
+$modx->regClientCSS(MODX_BASE_URL.'assets/modules/easyForm/css/easyForm.css');
 
 include_once("functions.easyForm.php");
 
@@ -17,6 +18,11 @@ $out='';
 $formid=$params['formid'];
 $eid=str_replace('f','',$formid);
 $capcha=(isset($params['vericode'])&&$params['vericode']!='0')?true:false;
+if(isset($params['ajaxMode'])&&$params['ajaxMode']!='0'){
+	$src=MODX_BASE_URL.'assets/modules/easyForm/js/easyForm.js';
+	$modx->regClientStartupScript($src);
+	$out.='<script type="text/javascript">var furl="'.MODX_BASE_URL.'";</script>';
+};
 $params['tpl']=makeTpl($eid,$capcha);
 $params['report']=makeReportTpl($eid);
 $formInfo=getFormInfo($eid);
