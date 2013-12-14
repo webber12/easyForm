@@ -14,4 +14,4 @@
  */
  
  
-return require_once MODX_BASE_PATH."assets/modules/easyForm/snippet.easyForm.php";
+return require_once MODX_BASE_PATH."assets/snippets/easyForm/snippet.easyForm.php";

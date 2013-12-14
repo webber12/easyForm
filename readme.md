@@ -9,7 +9,7 @@ version 0.1
 ### Состав:
 ---------
 * 1. Папка assets/modules/easyForm
-
+* 2. Папка assets/snippets/easyForm
 
 ### Установка:
 ---------
@@ -17,7 +17,7 @@ version 0.1
 * 2. Распаковываем содержимое и помещаем в корень сайта
 * 3. создаем модуль с названием easyForm и кодом require_once MODX_BASE_PATH."assets/modules/easyForm/module.easyForm.php";
 * 4. создаем сниппет с названием easyForm и кодом 
-return require_once MODX_BASE_PATH."assets/modules/easyForm/snippet.easyForm.php";
+return require_once MODX_BASE_PATH."assets/snippets/easyForm/snippet.easyForm.php";
 
 
 
