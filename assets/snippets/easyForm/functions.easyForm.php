@@ -24,11 +24,11 @@ function makeTpl($id,$capcha=false,$config='default'){
 	if(isset($id)&&$modx->db->getRecordCount($modx->db->query("SELECT * FROM ".$modx->getFullTableName('forms')." WHERE id=".$id." LIMIT 0,1"))==1)
 	{
 		//подключаем файл конфигурации с шаблонами
-		if(is_file(MODX_BASE_PATH.'assets/modules/easyForm/config/config.'.$config.'.php')){
-			include_once(MODX_BASE_PATH.'assets/modules/easyForm/config/config.'.$config.'.php');
+		if(is_file(MODX_BASE_PATH.'assets/snippets/easyForm/config/config.'.$config.'.php')){
+			include_once(MODX_BASE_PATH.'assets/snippets/easyForm/config/config.'.$config.'.php');
 		}
 		else{
-			include_once(MODX_BASE_PATH.'assets/modules/easyForm/config/config.default.php');
+			include_once(MODX_BASE_PATH.'assets/snippets/easyForm/config/config.default.php');
 		}
 		
 		$forma=$modx->db->query("SELECT * FROM ".$modx->getFullTableName('form_fields')." WHERE parent=".$id." ORDER BY sort ASC");
