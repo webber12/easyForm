@@ -7,11 +7,16 @@
 
 if(!defined('MODX_BASE_PATH')){die('What are you doing? Get out of here!');}
 
+//значения по умолчанию
 $moduleid=(int)$_GET['id'];
 $theme=$modx->config['manager_theme'];
+$info_type=1;
+$eBlock=''; //тут будет главный инфоблок в зависимости от значения $info_type
+$info=''; //информационная надпись в случае удачного/неудачного действия
+$zagol='Список доступных форм';
 
-$forms_table=$modx->getFullTableName('forms');
-$flds_table=$modx->getFullTableName('form_fields');
+$forms_table=$modx->getFullTableName('forms'); //таблица с формами
+$flds_table=$modx->getFullTableName('form_fields'); //таблица со списком полей форм
 
 //создаем таблицу форм, если ее нет
 $sql="
@@ -41,8 +46,6 @@ CREATE TABLE IF NOT EXISTS ".$flds_table." (
 ";
 $q=$modx->db->query($sql);
 
-
-
 $type=array(//доступные типы полей в форме
 	"1"=>"Строка",
 	"2"=>"Текст",
@@ -55,55 +58,21 @@ $type=array(//доступные типы полей в форме
 	"10"=>"Скрытое поле hidden"
 );
 
-
-$info='';
-
-$out.='
-<!doctype html>
-<html lang="ru">
-<head>
-	<title>Управление заявками</title>
-	<link rel="stylesheet" type="text/css" href="media/style/'.$theme.'/style.css" />
-<style>
-table{width:100%;}
-table td{padding:2px 5px !important;border:solid 1px white;height:38px;vertical-align:middle !important;}
-table thead td{color:white;height:25px;
-	border: 1px solid #658f1a;
-	background: none repeat scroll 0 0 #66901b;
-	text-shadow: 0px -1px 0px #2B5F0C;
-		border-radius:5px 5px 0 0;
-		-moz-border-radius:5px 5px 0 0;
-		-webkit-border-radius:5px 5px 0 0;
-		-ms-border-radius:0;
-		background:-moz-linear-gradient(#8aae4b, #66901b);
-		background:-webkit-gradient(linear, 0 0, 0 100%, from(#8aae4b), to(#66901b));
-		background:-o-linear-gradient(#8aae4b, #66901b);
-}
-input[type="text"]{width:300px;margin-bottom:5px !important;}
-select{width:307px;margin-bottom:5px !important;}
-input[type="text"].small{width:35px;}
-p.info{color:#008000;}
-</style>
-</head>
-<body>
-';
-
-$out.='<h1>Управление формами</h1>';
-$zagol='Список доступных форм';
-$info_type=1;
-
 function escape($a){
 	global $modx;
 	return $modx->db->escape($a);
 }
 
+
 if(isset($_POST['delform1'])){//удаление формы
 	$query=$modx->db->query("DELETE FROM ".$forms_table." WHERE id=".(int)$_POST['delform1']);
 	if($query){$info='<p class="info">Форма успешно удалена</p>';}
+	else{$info='<p class="info error">Не удалось удалить форму</p>';}
 }
 if(isset($_POST['delpole1'])){//удаление поля
 	$query=$modx->db->query("DELETE FROM ".$flds_table." WHERE id=".(int)$_POST['delpole1']);
 	if($query){$info='<p class="info">Поле успешно удалено</p>';}
+	else{$info='<p class="info error">Не удалось удалить поле</p>';}
 }
 
 if(isset($_POST['newformname'])&&isset($_POST['newformtitle'])){//добавляем новую форму
@@ -123,6 +92,7 @@ if(isset($_POST['newformname'])&&isset($_POST['newformtitle'])){//добавля
 	);
 	$query=$modx->db->insert($flds,$forms_table);
 	if($query){$info='<p class="info">Форма успешно добавлена</p>';}
+	else{$info='<p class="info error">Не удалось добавить форму</p>';}
 }
 
 if(isset($_GET['fid'])&&isset($_GET['action'])&&$_GET['action']=='edit'){//редактирование формы
@@ -139,6 +109,7 @@ if(isset($_GET['fid'])&&isset($_GET['action'])&&$_GET['action']=='edit'){//ре�
 		);
 		$query=$modx->db->update($flds,$forms_table,"id=".(int)$_GET['fid']);
 		if($query){$info='<p class="info">Форма успешно изменена</p>';}
+		else{$info='<p class="info error">Не удалось изменить форму</p>';}
 	}
 	$form_info=$modx->db->getRow($modx->db->query("SELECT * FROM ".$forms_table." WHERE id=".(int)$_GET['fid']." LIMIT 0,1"));
 }
@@ -176,6 +147,7 @@ if(isset($_GET['fid'])&&isset($_GET['action'])&&$_GET['action']=='pole'&&!isset(
 		);
 		$query=$modx->db->insert($flds,$flds_table);
 		if($query){$info='<p class="info">Поле успешно добавлено</p>';}
+		else{$info='<p class="info error">Не удалось добавить поле</p>';}
 	}
 }//конец список полей
 
@@ -198,30 +170,29 @@ if(isset($_GET['fid'])&&isset($_GET['action'])&&$_GET['action']=='pole'&&isset($
 		);
 		$query=$modx->db->update($flds,$flds_table,"id=".(int)$_GET['pid']);
 		if($query){$info='<p class="info">Поле успешно изменено</p>';}
+		else{$info='<p class="info error">Не удалось изменить поле</p>';}
 	}
 	$pole_info=$modx->db->getRow($modx->db->query("SELECT * FROM ".$flds_table." WHERE id=".(int)$_GET['pid']." LIMIT 0,1"));
 }
 
 
-
-$out.='<div class="sectionHeader">'.$zagol.'</div><div class="sectionBody">';
-
-$out.='<div class="action_info">'.$info.'</div>';
+/*************** формируем главный инфоблок контента $eBlock в зависимости
+******************** от выбранного действия *****************************/
 
 //блок вывода списка форм
 if($info_type==1){
 	$form_list=$modx->db->query("SELECT * FROM ".$forms_table." ORDER BY sort ASC");
-	$out.='<table class="fl"><thead><tr><td>id</td><td>Имя</td><td>Описание</td><td>Email</td><td>Поля</td><td>Изменить</td><td>Удалить</td></tr></thead><tbody>';
+	$eBlock.='<table class="fl"><thead><tr><td>id</td><td>Имя</td><td>Описание</td><td>Email</td><td>Поля</td><td>Изменить</td><td>Удалить</td></tr></thead><tbody>';
 	while($row=$modx->db->getRow($form_list)){
-		$out.='<tr>
+		$eBlock.='<tr>
 				<td>'.$row['id'].'</td><td>'.$row['name'].'</td><td>'.$row['title'].'</td><td>'.$row['email'].'</td>
 				<td class="actionButtons"><a href="index.php?a=112&id='.$moduleid.'&fid='.$row['id'].'&action=pole" class="button choice"> <img src="media/style/'.$theme.'/images/icons/page_white_copy.png" alt=""> Список полей</a></td>
 				<td class="actionButtons"><a href="index.php?a=112&id='.$moduleid.'&fid='.$row['id'].'&action=edit" class="button edit"> <img alt="" src="media/style/'.$theme.'/images/icons/page_white_magnify.png" > Изменить</a></td>
 				<td class="actionButtons"><a onclick="document.delform.delform1.value='.$row['id'].';document.delform.submit();" style="cursor:pointer;" class="button delete"> <img src="media/style/'.$theme.'/images/icons/delete.png" alt=""> удалить</a></td>
 			</tr>';
 	}
-	$out.='</tbody></table>';
-	$out.= '<br><br>
+	$eBlock.='</tbody></table>';
+	$eBlock.= '<br><br>
 		<form action="" method="post" class="actionButtons"> 
 			Название: <br><input type="text" value="" name="newformname"><br>
 			Описание: <br><input type="text" value="" name="newformtitle"><br>
@@ -235,7 +206,7 @@ if($info_type==1){
 
 //блок редактирования формы
 if($info_type==2){
-	$out.= '
+	$eBlock.= '
 		<form action="" method="post" class="actionButtons"> 
 			Название: <br><input type="text" value="'.$form_info['name'].'" name="curformname" size="50"><br> 
 			Описание: <br><input type="text" value="'.$form_info['title'].'" name="curformtitle" size="50"><br>
@@ -251,11 +222,11 @@ if($info_type==2){
 //блок вывода списка полей формы
 if($info_type==3){
 	$form_list=$modx->db->query("SELECT * FROM ".$flds_table." WHERE parent=".(int)$_GET['fid']." ORDER BY sort ASC");
-	$out.='
+	$eBlock.='
 	<form id="sortpole" action="" method="post" class="actionButtons">
 		<table class="fl"><thead><tr><td>Имя</td><td>Тип</td><td>Значение</td><td>Порядок</td><td>Изменить</td><td>Удалить</td></tr></thead><tbody>';
 		while($row=$modx->db->getRow($form_list)){
-			$out.='
+			$eBlock.='
 					<tr>
 						<td>'.$row['title'].' '.($row['required']==1?'<b>(+)</b>':'').'</td><td> '.$type[$row['type']].' </td><td> '.nl2br($row['value']).' </td>
 						<td><input type="text" name="sortpole['.$row['id'].']" value="'.$row['sort'].'" class="sort small"></td>
@@ -264,7 +235,7 @@ if($info_type==3){
 					</tr>
 			';
 		}
-	$out.='</tbody></table>
+	$eBlock.='</tbody></table>
 			<br><input type="submit" value="Сохранить порядок">
 			</form>
 			<br><br>
@@ -277,8 +248,8 @@ if($info_type==3){
 	foreach($type as $k=>$v){
 		$options.="<option value='".$k."'>".$v."</option>";
 	}
-	$out.='<select name="newpoletype">'.$options.'</select><br>';
-	$out.='
+	$eBlock.='<select name="newpoletype">'.$options.'</select><br>';
+	$eBlock.='
 		Значение (для типа "список","переключатель","флажок") в формате "значение==подпись" либо просто "подпись", если значение и подпись совпадают (каждый вариант - с новой строки):<br>
 		<textarea name="newpolevalue"></textarea>
 		<br>
@@ -294,7 +265,7 @@ if($info_type==3){
 
 //блок редактирования поля
 if($info_type==4){
-	$out.='
+	$eBlock.='
 		<form action="" method="post" class="actionButtons"> 
 			Название: <br><input type="text" value="'.$pole_info['title'].'" name="curpoletitle"><br> 
 			Тип: <br>
@@ -303,7 +274,7 @@ if($info_type==4){
 	foreach($type as $k=>$v){
 		$options.="<option value='".$k."' ".($k==$pole_info['type']?" selected=selected":"").">".$v."</option>";
 	}
-	$out.='<select name="curpoletype">'.$options.'</select><br>
+	$eBlock.='<select name="curpoletype">'.$options.'</select><br>
 			Значение (для типа "список","переключатель","флажок") в формате "значение==подпись" либо просто "подпись", если значение и подпись совпадают (каждый вариант - с новой строки): 
 			<br>
 			<textarea name="curpolevalue">'.$pole_info['value'].'</textarea><br>
@@ -315,19 +286,61 @@ if($info_type==4){
 }
 
 
-$out.='
-<form action="" method="post" id="delform" name="delform"> 
-	<input type="hidden" name="delform1" value="">
-</form>
-';
+/************* конец формирования главного блока контента eBlock ************/
 
-$out.='
-<form action="" method="post" id="delpole" name="delpole"> 
-	<input type="hidden" name="delpole1" value="">
-</form>
-';
 
-$out.='</div></body></html>';
+
+/********************* шаблон вывода в модуль ************************/
+$output=<<<OUT
+<!doctype html>
+<html lang="ru">
+<head>
+	<title>Управление формами</title>
+	<link rel="stylesheet" type="text/css" href="media/style/{$theme}/style.css" />
+<style>
+	table{width:100%;}
+	table td{padding:2px 5px !important;border:solid 1px white;height:38px;vertical-align:middle !important;}
+	table thead td{color:white;height:25px;
+		border: 1px solid #658f1a;
+		background: none repeat scroll 0 0 #66901b;
+		text-shadow: 0px -1px 0px #2B5F0C;
+		border-radius:5px 5px 0 0;
+		-moz-border-radius:5px 5px 0 0;
+		-webkit-border-radius:5px 5px 0 0;
+		-ms-border-radius:0;
+		background:-moz-linear-gradient(#8aae4b, #66901b);
+		background:-webkit-gradient(linear, 0 0, 0 100%, from(#8aae4b), to(#66901b));
+		background:-o-linear-gradient(#8aae4b, #66901b);
+	}
+	input[type="text"]{width:300px;margin-bottom:5px !important;}
+	select{width:307px;margin-bottom:5px !important;}
+	input[type="text"].small{width:35px;}
+	p.info{color:#008000;}
+	p.error{color:#cc0000;}
+</style>
+</head>
+<body>
+	<h1>Управление формами</h1>
+	<div class="sectionHeader">{$zagol}</div>
+	<div class="sectionBody">
+		<div class="action_info">{$info}</div>
+			
+		{$eBlock}
+				
+		<form action="" method="post" id="delform" name="delform"> 
+			<input type="hidden" name="delform1" value="">
+		</form>
+		<form action="" method="post" id="delpole" name="delpole"> 
+			<input type="hidden" name="delpole1" value="">
+		</form>
+	</div>
+</body>
+</html>
+OUT;
+
+/****************** конец формирования шаблона в модуль ************/
+
+
 //выводим все в область контента модуля
-echo $out;
+echo $output;
 ?>
