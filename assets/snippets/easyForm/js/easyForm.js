@@ -1,5 +1,6 @@
 $(document).ready(function(){
 
+$(".validation_message").css({'display':'none'});
 
 function showInfo(msg){
 	var inf=$("<div class='easyForm_errors'>"+msg+"</div>");
@@ -26,6 +27,7 @@ $(document).on("submit","form.easyForm",function(event){
 			if(error){
 				showInfo(error);
 				$("div#"+parent_id).html(response);
+				$("div#"+parent_id).find("div.validation_message").css({'display':'none'});
 				$("div#"+parent_id).css({'opacity':'1'});
 				$("div#"+parent_id+" input[type='checkbox'].required").each(function(){
 					$(this).parent().parent().addClass("required");
